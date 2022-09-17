@@ -15,6 +15,7 @@ import { TwitterCard } from "../components/TwitterCard";
 const Home: NextPage = () => {
   return (
     <TwitterCard
+      type="promotion"
       user={{
         name: "あいうえお",
         accountName: "aiueo",
@@ -23,7 +24,11 @@ const Home: NextPage = () => {
       body={{
         text: "おはようございます",
       }}
-      analytics={[1, 2, 3]}
+      analytics={[
+        { path: "aiueo", count: 1 },
+        { path: "aiueo", count: 1 },
+        { path: "aiueo", count: 1 },
+      ]}
     />
   );
 };
