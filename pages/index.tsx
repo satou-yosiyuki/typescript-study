@@ -1,35 +1,85 @@
 import type { NextPage } from "next";
-import { TwitterCard } from "../components/TwitterCard";
+import { ChangeEventHandler, MouseEventHandler, useState, FC } from "react";
 
-// 型推論 型を推測してくれる
-// 型アノテーション 型を明示的に示す
-// 型アサーション型を上書きする
-// プリミティブ型とオブジェクト(プリミティブ型以外、配列、関数など)
-// nullよりundifinedが推奨
-// APIでjsonを返すときはnull
-// LiteralTypes 文字列やNumberやbooleanなどを限定的に宣言する
-//any時は実行するときも何でも行ける
-// unknownは実行するときは型安全
-// void関数の返り値がない
+type Todo = {
+  id: number;
+  label: string;
+  isDone: boolean;
+};
 
 const Home: NextPage = () => {
+  const [text, setText] = useState("");
+  const [todos, setTodos] = useState<Todo[]>([]);
+
+  const input: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setText(e.target.value);
+  };
+
+  // MouseEventHandler<HTMLButtonElement>は講座内で説明し忘れたコードです
+  // input, toggleと同じ要領で追加しています
+  const add: MouseEventHandler<HTMLButtonElement> = () => {
+    setTodos((prevTodos) => {
+      return [...prevTodos, { id: Math.random(), label: text, isDone: false }];
+    });
+    setText("");
+  };
+
+  const toggle: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setTodos((prevTodos) => {
+      return prevTodos.map((todo) => {
+        if (todo.id === Number(e.target.value)) {
+          return { ...todo, isDone: !todo.isDone };
+        }
+        return todo;
+      });
+    });
+  };
+
   return (
-    <TwitterCard
-      type="promotion"
-      user={{
-        name: "あいうえお",
-        accountName: "aiueo",
-        image: "https://aiueo",
-      }}
-      body={{
-        text: "おはようございます",
-      }}
-      analytics={[
-        { path: "aiueo", count: 1 },
-        { path: "aiueo", count: 1 },
-        { path: "aiueo", count: 1 },
-      ]}
-    />
+    <div className="w-96 mx-auto p-20">
+      <h1 className="text-xl font-bold">Todo</h1>
+      <div className="flex gap-x-2">
+        <input
+          type="text"
+          value={text}
+          onChange={input}
+          className="border border-black"
+        />
+        <button
+          onClick={add}
+          className="border border-black flex-shrink-0 px-2"
+        >
+          追加
+        </button>
+      </div>
+      <ul className="mt-4 space-y-2">
+        {todos.map((todo) => (
+          <li key={todo.id}>
+            <ListItem todo={todo} toggle={toggle} />
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 };
+
+type ListItemProps = {
+  todo: Todo;
+  toggle: ChangeEventHandler<HTMLInputElement>;
+};
+
+const ListItem: FC<ListItemProps> = ({ todo, toggle }) => {
+  return (
+    <label className="flex items-center gap-x-2">
+      <input
+        type="checkbox"
+        value={todo.id}
+        checked={todo.isDone}
+        onChange={toggle}
+      />
+      <span>{todo.label}</span>
+    </label>
+  );
+};
+
 export default Home;
